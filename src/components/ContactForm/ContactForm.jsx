@@ -1,67 +1,57 @@
-import React, { Component } from 'react';
-import shortid from 'shortid';
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import initialState from './initialState';
 import contactForm from './contactForm.module.css';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+const ContactForm = ({ onSubmit }) => {
+  const [state, setState] = useState({ ...initialState });
 
-  nameInputId = shortid.generate();
-  numberInpitId = shortid.generate();
-
-  handleChange = e => {
-    const { name, value } = e.currentTarget;
-    this.setState({ [name]: value });
-  };
-
-  handleSubmit = e => {
-    const { name, number } = this.state;
-    e.preventDefault();
-    this.props.onSubmit(name, number);
-    this.reset();
-  };
-
-  reset() {
-    this.setState({
-      name: '',
-      number: '',
+  const hendleChange = ({ target }) => {
+    const { name, value } = target;
+    setState(prevState => {
+      return { ...prevState, [name]: value };
     });
-  }
+  };
 
-  render() {
-    return (
-      <form className={contactForm.form} onSubmit={this.handleSubmit}>
-        <label className={contactForm.label} htmlFor={this.nameInputId}>
-          Name
-          <input
-            className={contactForm.input}
-            type="text"
-            name="name"
-            value={this.state.name}
-            onChange={this.handleChange}
-            id={this.nameInputId}
-          />
-        </label>
-        <label className={contactForm.label} htmlFor={this.numberInputId}>
-          Number
-          <input
-            className={contactForm.input}
-            type="text"
-            name="number"
-            value={this.state.number}
-            onChange={this.handleChange}
-            id={this.numberInputId}
-          />
-        </label>
+  const hendleSubmit = e => {
+    e.preventDefault();
+    onSubmit({ name, number });
+    setState({ ...initialState });
+  };
+  const { name, number } = state;
+  return (
+    <form className={contactForm.form} onSubmit={hendleSubmit}>
+      <label className={contactForm.label}>
+        Name
+        <input
+          className={contactForm.input}
+          onChange={hendleChange}
+          type="text"
+          name="name"
+          value={name}
+          placeholder="Input name"
+        />
+      </label>
+      <label className={contactForm.label}>
+        Number
+        <input
+          className={contactForm.input}
+          onChange={hendleChange}
+          type="text"
+          name="number"
+          value={number}
+          placeholder="Input number"
+        />
+      </label>
 
-        <button className={contactForm.button} type="submit">
-          Add contact
-        </button>
-      </form>
-    );
-  }
-}
-
+      <button className={contactForm.button} type="submit">
+        Add contact
+      </button>
+    </form>
+  );
+};
 export default ContactForm;
+
+ContactForm.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+};
